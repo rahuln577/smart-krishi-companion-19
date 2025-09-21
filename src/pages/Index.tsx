@@ -7,6 +7,7 @@ import Navigation from "@/components/Navigation";
 import CropRecommendation from "@/components/CropRecommendation";
 import PlantTracking from "@/components/PlantTracking";
 import MarketTrends from "@/components/MarketTrends";
+import ChatBot from "@/components/ChatBot";
 import heroImage from "@/assets/agri-hero.jpg";
 import cropField from "@/assets/crop-field.jpg";
 
@@ -68,13 +69,7 @@ const Index = () => {
       case "market":
         return <MarketTrends />;
       case "chat":
-        return (
-          <div className="text-center py-12">
-            <MessageCircle className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-primary mb-2">AI Farming Assistant</h2>
-            <p className="text-muted-foreground">Chat feature coming soon...</p>
-          </div>
-        );
+        return <ChatBot />;
       case "scanner":
         return (
           <div className="text-center py-12">
