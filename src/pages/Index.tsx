@@ -8,6 +8,7 @@ import CropRecommendation from "@/components/CropRecommendation";
 import PlantTracking from "@/components/PlantTracking";
 import MarketTrends from "@/components/MarketTrends";
 import ChatBot from "@/components/ChatBot";
+import FloatingChatButton from "@/components/FloatingChatButton";
 import heroImage from "@/assets/agri-hero.jpg";
 import cropField from "@/assets/crop-field.jpg";
 
@@ -172,6 +173,9 @@ const Index = () => {
       </main>
 
       <Navigation />
+      
+      {/* Floating Chat Button - only show on dashboard */}
+      {activeSection === "dashboard" && <FloatingChatButton />}
     </div>
   );
 };

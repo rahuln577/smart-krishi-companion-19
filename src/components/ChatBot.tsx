@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Leaf } from "lucide-react";
+import { Send, Bot, User, Leaf, X, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface Message {
   id: string;
@@ -12,17 +13,23 @@ interface Message {
   timestamp: Date;
 }
 
-const ChatBot = () => {
+interface ChatBotProps {
+  isFloating?: boolean;
+  onClose?: () => void;
+}
+
+const ChatBot = ({ isFloating = false, onClose }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your AgriSmart AI assistant. I can help you with crop recommendations, pest management, irrigation, soil health, and general farming advice. What would you like to know?",
+      content: "🌱 Hello! I'm your AgriSmart AI assistant. I can help you with crop recommendations, pest management, irrigation, soil health, and general farming advice. What would you like to know?",
       sender: "bot",
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isOnline] = useState(true);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const farmingResponses = {
@@ -139,13 +146,26 @@ const ChatBot = () => {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-[600px]">
-      <Card className="flex-1 flex flex-col">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Bot className="h-5 w-5" />
-            AgriSmart AI Assistant
-          </CardTitle>
+    <div className={`flex flex-col ${isFloating ? 'h-[500px] w-[380px]' : 'h-[600px]'}`}>
+      <Card className={`flex-1 flex flex-col shadow-xl border-primary/20 ${isFloating ? 'rounded-t-2xl rounded-b-none' : ''}`}>
+        <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-success/5 rounded-t-lg border-b border-border/50">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-primary">
+              <div className="relative">
+                <Bot className="h-5 w-5" />
+                {isOnline && (
+                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-success rounded-full border-2 border-white"></div>
+                )}
+              </div>
+              AgriSmart AI Assistant
+              <Badge variant="secondary" className="text-xs">ONLINE</Badge>
+            </CardTitle>
+            {isFloating && onClose && (
+              <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">Ask me about crops, pest management, soil health, irrigation, and farming best practices</p>
         </CardHeader>
         
@@ -159,28 +179,28 @@ const ChatBot = () => {
                     message.sender === "user" ? "flex-row-reverse" : ""
                   }`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.sender === "user" 
-                      ? "bg-primary text-primary-foreground" 
-                      : "bg-success text-success-foreground"
-                  }`}>
-                    {message.sender === "user" ? (
-                      <User className="h-4 w-4" />
-                    ) : (
-                      <Leaf className="h-4 w-4" />
-                    )}
-                  </div>
+                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
+                     message.sender === "user" 
+                       ? "bg-gradient-to-br from-primary to-primary-dark text-primary-foreground" 
+                       : "bg-gradient-to-br from-success to-success-dark text-success-foreground"
+                   }`}>
+                     {message.sender === "user" ? (
+                       <User className="h-4 w-4" />
+                     ) : (
+                       <Leaf className="h-4 w-4" />
+                     )}
+                   </div>
                   
                   <div className={`max-w-[80%] ${
                     message.sender === "user" ? "text-right" : ""
                   }`}>
-                    <div className={`rounded-lg p-3 ${
-                      message.sender === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
-                    }`}>
-                      <p className="text-sm leading-relaxed">{message.content}</p>
-                    </div>
+                     <div className={`rounded-lg p-3 shadow-sm ${
+                       message.sender === "user"
+                         ? "bg-gradient-to-br from-primary to-primary-dark text-primary-foreground"
+                         : "bg-gradient-to-br from-muted to-muted/50 text-foreground border border-border/50"
+                     }`}>
+                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {message.timestamp.toLocaleTimeString([], { 
                         hour: '2-digit', 
@@ -191,42 +211,46 @@ const ChatBot = () => {
                 </div>
               ))}
               
-              {isTyping && (
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-success text-success-foreground flex items-center justify-center">
-                    <Leaf className="h-4 w-4" />
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
+               {isTyping && (
+                 <div className="flex items-start gap-3">
+                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-success to-success-dark text-success-foreground flex items-center justify-center shadow-sm">
+                     <Leaf className="h-4 w-4" />
+                   </div>
+                   <div className="bg-gradient-to-br from-muted to-muted/50 rounded-lg p-3 border border-border/50 shadow-sm">
+                     <div className="flex space-x-1">
+                       <div className="w-2 h-2 bg-success rounded-full animate-bounce"></div>
+                       <div className="w-2 h-2 bg-success rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                       <div className="w-2 h-2 bg-success rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                     </div>
+                     <p className="text-xs text-muted-foreground mt-1">AgriSmart is typing...</p>
+                   </div>
+                 </div>
+               )}
             </div>
           </ScrollArea>
           
-          <div className="border-t border-border p-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Ask about farming, crops, pests, soil, weather..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1 border-primary/20"
-                disabled={isTyping}
-              />
-              <Button 
-                onClick={handleSendMessage} 
-                disabled={!inputValue.trim() || isTyping}
-                className="px-3"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+           <div className="border-t border-border p-4 bg-gradient-to-r from-background to-muted/20">
+             <div className="flex gap-2">
+               <Input
+                 placeholder="Ask about farming, crops, pests, soil, weather..."
+                 value={inputValue}
+                 onChange={(e) => setInputValue(e.target.value)}
+                 onKeyPress={handleKeyPress}
+                 className="flex-1 border-primary/20 focus:border-primary/50 bg-background/50 backdrop-blur-sm"
+                 disabled={isTyping}
+               />
+               <Button 
+                 onClick={handleSendMessage} 
+                 disabled={!inputValue.trim() || isTyping}
+                 className="px-3 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary shadow-lg"
+               >
+                 <Send className="h-4 w-4" />
+               </Button>
+             </div>
+             <p className="text-xs text-muted-foreground mt-2 text-center">
+               💡 Try asking: "Best crops for monsoon season" or "How to control aphids"
+             </p>
+           </div>
         </CardContent>
       </Card>
     </div>
